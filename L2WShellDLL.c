@@ -7,15 +7,15 @@
 #define MAX_LINE 1024
 #define MAX_ARGS 16
 
-static int __cdecl ParseCommand(char *line, char *args[], int limit);
-static int __cdecl ExecuteCommand(const char *windows_verb, const char *const args[], int argc);
-static int __cdecl ExecuteCommand(const char *windows_verb, const char *const args[], int argc);
+static int __cdecl ParseCommand(char* line, char* args[], int limit);
+static int __cdecl ExecuteCommand(const char* windows_verb, const char* const args[], int argc);
+static int __cdecl ExecuteCommand(const char* windows_verb, const char* const args[], int argc);
 
-int __cdecl ParseCommand(char *line, char *args[], int limit)
+int __cdecl ParseCommand(char* line, char* args[], int limit)
 {
     int count = 0;
-    char *readp = line;
-    char *writep = line;
+    char* readp = line;
+    char* writep = line;
     if (!line || !args || limit <= 0 || limit > MAX_ARGS)
         return -1;
     while (*readp) {
@@ -31,10 +31,12 @@ int __cdecl ParseCommand(char *line, char *args[], int limit)
             if (*readp == '"') {
                 quoted = !quoted;
                 ++readp;
-            } else if (!quoted && isspace((unsigned char)*readp)) {
+            }
+            else if (!quoted && isspace((unsigned char)*readp)) {
                 ++readp;
                 break;
-            } else {
+            }
+            else {
                 *writep++ = *readp++;
             }
         }
@@ -46,9 +48,9 @@ int __cdecl ParseCommand(char *line, char *args[], int limit)
 }
 #define ParseCommand ParseCommandAlias
 
-static int approved_verb(const char *verb)
+static int approved_verb(const char* verb)
 {
-    static const char *const verbs[] = {
+    static const char* const verbs[] = {
         "dir", "type", "copy", "move", "del", "mkdir", "rmdir", "echo"
     };
     size_t i;
@@ -60,9 +62,9 @@ static int approved_verb(const char *verb)
     return 0;
 }
 
-static int safe_argument(const char *s)
+static int safe_argument(const char* s)
 {
-    const unsigned char *p = (const unsigned char *)s;
+    const unsigned char* p = (const unsigned char*)s;
     if (!p || !*p)
         return 0;
     while (*p) {
@@ -73,7 +75,7 @@ static int safe_argument(const char *s)
     return 1;
 }
 
-static int append_token(char *out, size_t capacity, const char *token)
+static int append_token(char* out, size_t capacity, const char* token)
 {
     size_t used = strlen(out);
     size_t len = strlen(token);
@@ -88,9 +90,9 @@ static int append_token(char *out, size_t capacity, const char *token)
     return 1;
 }
 
-int __stdcall ExecuteCommand(const char *windows_verb, const char *const args[], int argc)
+int __cdecl ExecuteCommand(const char* windows_verb, const char* const args[], int argc)
 {
-    char command[MAX_LINE * 2] = {0};
+    char command[MAX_LINE * 2] = { 0 };
     char cmdline[MAX_LINE * 2 + 64];
     STARTUPINFOA si;
     PROCESS_INFORMATION pi;
@@ -117,7 +119,7 @@ int __stdcall ExecuteCommand(const char *windows_verb, const char *const args[],
     ZeroMemory(&pi, sizeof(pi));
     si.cb = sizeof(si);
     if (!CreateProcessA(NULL, cmdline, NULL, NULL, FALSE, 0,
-                        NULL, NULL, &si, &pi)) {
+        NULL, NULL, &si, &pi)) {
         fprintf(stderr, "Command execution failed: %lu\n", GetLastError());
         return 1;
     }
@@ -128,4 +130,3 @@ int __stdcall ExecuteCommand(const char *windows_verb, const char *const args[],
     CloseHandle(pi.hProcess);
     return (int)code;
 }
-#pragma comment(linker, "/export:MissingFunction=_MissingFunction@0")
