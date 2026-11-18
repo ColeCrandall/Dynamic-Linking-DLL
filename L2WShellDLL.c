@@ -4,14 +4,17 @@
 #include <string.h>
 #include <ctype.h>
 
+#ifdef __cplusplus
+#define DLL_EXPORT extern "C" __declspec(dllexport)
+#else
+#define DLL_EXPORT __declspec(dllexport)
+#endif
+
 #define MAX_LINE 1024
 #define MAX_ARGS 16
 
-static int __cdecl ParseCommand(char* line, char* args[], int limit);
-static int __cdecl ExecuteCommand(const char* windows_verb, const char* const args[], int argc);
-static int __cdecl ExecuteCommand(const char* windows_verb, const char* const args[], int argc);
 
-int __cdecl ParseCommand(char* line, char* args[], int limit)
+DLL_EXPORT int __stdcall ParseCmd(char* line, char* args[], int limit)
 {
     int count = 0;
     char* readp = line;
@@ -90,7 +93,7 @@ static int append_token(char* out, size_t capacity, const char* token)
     return 1;
 }
 
-int __cdecl ExecuteCommand(const char* windows_verb, const char* const args[], int argc)
+DLL_EXPORT int __stdcall ExecuteCommand(const char* windows_verb, const char* const args[], int argc)
 {
     char command[MAX_LINE * 2] = { 0 };
     char cmdline[MAX_LINE * 2 + 64];
